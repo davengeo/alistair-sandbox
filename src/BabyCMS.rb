@@ -1,15 +1,5 @@
 require 'rack'
 
-
-#require 'Sinatra'
-=begin
-get '/babyCMS' do
-  out = "babyCMS"
-end
-=end
-
-
-
 class BabyCMS
   def call(env)
     request  = Rack::Request.new(env)
