@@ -1,16 +1,10 @@
 require 'rack'
+require_relative 'handle_get'
 
 class BabyCMS
   def call(env)
     request  = Rack::Request.new(env)
-    isGet = request.get?
-
-    response = Rack::Response.new
-    response['Content-Type'] = 'text/html'
-    response.write "Welcome to test_01"
-#    response.write 'Hello!' + env["PATH_INFO"]
-#    response.write '!Good-bye!' + env.to_s
-    response.finish
+    if request.get? then handle_get(request); end
   end
 end
 

@@ -1,33 +1,39 @@
 require 'rspec/expectations'
 require 'test/unit'
 require 'rack/test'
-#require 'Sinatra'
-require_relative '../src/BabyCMS.rb'
-    require "net/http"
-    require "uri"
+require "net/http"
+require "uri"
 
 class TestRequestsToBabyCMS < Test::Unit::TestCase
-  include Rack::Test::Methods
+    include Rack::Test::Methods
 
+  def run_test_without_server(route, expectedResult)
+    require_relative '../src/BabyCMS1.rb'
+    app = BabyCMS.new
+    response = app.call(Rack::MockRequest.env_for(route, {}))
+    body = response[2].body
+    result = body[0]
+    result.should == expectedResult
+
+  end
 
   def test_00_hello_without_server
-    app = BabyCMS.new
-    env = Rack::MockRequest.env_for('/', {})
-    response = app.call(env)
-    body = response[2].body
-    puts body
-    body.should == ["Welcome to test_01"]
+    run_test_without_server('/', "Welcome to test_01")
+  end
+
+  def run_test_with_server(route, expectedResult)
+    require 'Sinatra'
+    require_relative '../src/handle_thru_sinatra'
+    def app
+      Sinatra::Application
+    end
+    get route
+    body = last_response.body
+    body.should == expectedResult
   end
 
   def test_01_hello_with_server
-  # this scratchpad code doesn't really work the way we want it to.
-  # Please replace:
-    Rack::Server.start :app => BabyCMS.new
-
-    uri = URI.parse("http://localhost:8080/")
-    response = Net::HTTP.get_response(uri)
-    puts response
-
+    run_test_with_server('/', "Welcome to test_01")
   end
 
 end
